@@ -20,15 +20,16 @@
 \usepackage{bibunits}
 \usepackage[spanish]{babel} 
 \usepackage{listings}
- \usepackage{xcolor}
- 
+\usepackage{xcolor}
+\usepackage{pgf,pgffor} 
+
 \lstdefinestyle{base}{  breaklines=true,
                     basicstyle=\footnotesize,
                     numbers=left,
                     numberstyle=\tiny, numbersep=5pt,
                     breaklines=true,
-                    tabsize=2, captionpos=b , stepnumber=1 , aboveskip=20pt
-					moredelim=**[is][\color{red}]{@}{@}
+                    tabsize=2, captionpos=b , stepnumber=1 , aboveskip=20pt,
+                    moredelim=**[is][\color{red}]{@}{@}
         }
 
 \title{Aplanado eficiente de grandes modelos Modelica}
@@ -66,48 +67,78 @@
         \item Modelado de sistemas complejos, con componentes mec\'anicos, el\'ectricos, electr\'onicos, hidr\'aulicos, t\'ermicos, etc.     
         \item Desarrollado por la asociaci\'on sin fines de lucro ``Modelica Asociation''.
         \item Entornos de desarrollo: OpenModelica, MathModelica, Dymola, etc.
+        
+        \item El modelo esta en texto plano
     \end{itemize}
 \end{frame}
  
 
 \begin{frame}[fragile]
 \frametitle{Clases} 
-\begin{itemize}
-	\item Orientaci\'on a objetos.
-	\item Definen objetos.
-	\item Son instanciados.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Clases} 
 \begin{columns}  
 \column{.5\textwidth}  
-\begin{lstlisting}[frame=single,style=base]
-    class circuits
+\begin{itemize}
+    \item Define un objeto.
+    \item Son instanciadas mediante la definici\'on de variables.
+    \item Tienen tres secci\'ones:
+        \begin{enumerate}
+            \item Definiciones
+            \item Ecuaciones
+            \item Sentencias
+        \end{enumerate}
+\end{itemize}
+
+\column{.5\textwidth}
+\begin{lstlisting}[style=base]
+    class X
+        // Definiciones de variables y clases   
+    equation
+        // Ecuaciones
+    statements
+        // Sentencias
+    end X;   
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Prefijos de Clases} 
+Prefijos de clase: \textit{model}, \textit{record}, \textit{block}, \textit{connector}, \textit{function}, \textit{package}
+\begin{itemize}
+    \item Mejoran la lectura del c\'odigo:
+    \item Agregan restricciones a la clase
+\end{itemize}   
+
+\begin{columns}  
+\column{.5\textwidth}  
+\begin{lstlisting}[style=base]
+    class Circuits
         cclass Pin
             Real v;
             flow Real i;
         end Pin;
         class Componente
             Pin n,p;
+        equation 
+            n.v = p.v;
         end Componente; 
-    end circuits;   
+    end Circuits;   
 \end{lstlisting}
 \par
 
 \column{.5\textwidth}
-\begin{lstlisting}[frame=single,style=base]
-    @package@ circuits
+\begin{lstlisting}[style=base]
+    @package@ Circuits
         @connector@ Pin
             Real v;
             flow Real i;
         end Pin;
         @model@ Componente
             Pin n,p;
+        equation 
+            n.v = p.v;
         end Componente; 
-    end circuits;   
+    end Circuits;   
 \end{lstlisting}
 \par
 \end{columns}

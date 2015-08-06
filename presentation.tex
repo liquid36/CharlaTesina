@@ -1,0 +1,116 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\mode<presentation>
+{
+  \usetheme{Copenhagen}
+  \setbeamercovered{transparent}
+}
+
+\setcounter{tocdepth}{1}
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Contenido de la charla}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage[scanall]{psfrag}
+\usepackage{bibunits}
+\usepackage[spanish]{babel} 
+\usepackage{listings}
+ \usepackage{xcolor}
+ 
+\lstdefinestyle{base}{  breaklines=true,
+                    basicstyle=\footnotesize,
+                    numbers=left,
+                    numberstyle=\tiny, numbersep=5pt,
+                    breaklines=true,
+                    tabsize=2, captionpos=b , stepnumber=1 , aboveskip=20pt
+					moredelim=**[is][\color{red}]{@}{@}
+        }
+
+\title{Aplanado eficiente de grandes modelos Modelica}
+\author[M.Botta] {Mariano Botta } 
+\institute[UNR] % (optional, but mostly needed)
+{ FCEIA, UNR }
+\date {Agosto 2015}
+
+\subject{Talks}
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+ 
+\section{Motivaciones}  
+
+\begin{frame}{Motivaciones}
+    \begin{itemize}
+     \item Modelado, Simulaci\'on y Control en Tiempo Real con Aplicaciones en Electr\'onica de Potencia.
+     \item Simulaci\'on en paralelo utilizando los m\'etodos de cuantificaci\'on de estado.  
+     \item Modelos grandes.
+     \item Aprovechar las ventajas de Modelica.
+    \end{itemize}
+\end{frame}
+
+\section{Introducci\'on a Modelica}
+
+
+
+\begin{frame}{Modelica} 
+    \begin{itemize}
+        \item Orientado a Objetos.
+        \item Modelado de sistemas complejos, con componentes mec\'anicos, el\'ectricos, electr\'onicos, hidr\'aulicos, t\'ermicos, etc.     
+        \item Desarrollado por la asociaci\'on sin fines de lucro ``Modelica Asociation''.
+        \item Entornos de desarrollo: OpenModelica, MathModelica, Dymola, etc.
+    \end{itemize}
+\end{frame}
+ 
+
+\begin{frame}[fragile]
+\frametitle{Clases} 
+\begin{itemize}
+	\item Orientaci\'on a objetos.
+	\item Definen objetos.
+	\item Son instanciados.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Clases} 
+\begin{columns}  
+\column{.5\textwidth}  
+\begin{lstlisting}[frame=single,style=base]
+    class circuits
+        cclass Pin
+            Real v;
+            flow Real i;
+        end Pin;
+        class Componente
+            Pin n,p;
+        end Componente; 
+    end circuits;   
+\end{lstlisting}
+\par
+
+\column{.5\textwidth}
+\begin{lstlisting}[frame=single,style=base]
+    @package@ circuits
+        @connector@ Pin
+            Real v;
+            flow Real i;
+        end Pin;
+        @model@ Componente
+            Pin n,p;
+        end Componente; 
+    end circuits;   
+\end{lstlisting}
+\par
+\end{columns}
+\end{frame}
+
+\end{document}

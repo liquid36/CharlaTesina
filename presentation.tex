@@ -303,10 +303,10 @@ Los conectores:
 \item Se definen con el prefijo \textit{connector}.
 \item No tienen ecuaciones.
 \item Tienen variables de dos tipos:
-	\begin{enumerate}
-		\item Variables de potencial. Ejemplo: presi\'on, voltaje, etc. 
-		\item Variables de flujo: definidas con el prefijo flow. Ejemplo: corriente, caudal, etc.
-	\end{enumerate}
+    \begin{enumerate}
+        \item Variables de potencial. Ejemplo: presi\'on, voltaje, etc. 
+        \item Variables de flujo: definidas con el prefijo flow. Ejemplo: corriente, caudal, etc.
+    \end{enumerate}
 \item Ejemplo: Clase \textit{Pin}.
 \end{itemize}
 
@@ -328,48 +328,120 @@ Las ecuaciones \textit{connect}:
 \begin{frame}[fragile]
 \frametitle{Ecuaciones Connect} 
 \begin{columns}  
-\column[T]{6cm}
- \begin{lstlisting}[style=base]
-	package Circuits
-		...
-		model ground
-			Pin p;
-		equation
-			p.v = 0;
-		end ground;
-		model inductor
-			extends OnePort;
-			parameter Real L = 1;
-		equation
-			L * der(i) = v;
-		end inductor;
-		model LC_circuit
-			Capacitor cap(v(start = 1));
-			inductor ind(L = 2);
-			ground gr;
-		equation
-			connect(ind.p,cap.p);
-			connect(ind.n,cap.n);
-			connect(cap.n,gr.p);
-		end LC_circuit;
-	end Circuits
+\column[T]{8cm}
+ \begin{lstlisting}[basicstyle=\ttfamily\scriptsize,style=base]
+    package Circuits
+        ...
+        model ground
+            Pin p;
+        equation
+            p.v = 0;
+        end ground;
+        model inductor
+            extends OnePort;
+            parameter Real L = 1;
+        equation
+            L * der(i) = v;
+        end inductor;
+        model LC_circuit
+            Capacitor cap(v(start = 1));
+            inductor ind(L = 2);
+            ground gr;
+        equation
+            connect(ind.p,cap.p);
+            connect(ind.n,cap.n);
+            connect(cap.n,gr.p);
+        end LC_circuit;
+    end Circuits
 \end{lstlisting}
 \column[T]{6cm}
  \begin{lstlisting}[style=base]
-	// Variables de Potencial
-	ind.p.v = cap.p.v;
-	ind.n.v  = cap.n.v;
-	cap.n.v = gr.p.v;
-	
-	// Variables de flujo
-	ind.p.i + cap.p.i = 0;
-	ind.n.i + cap.n.i + gr.p.i = 0;
+    // Variables de Potencial
+    ind.p.v = cap.p.v;
+    ind.n.v  = cap.n.v;
+    cap.n.v = gr.p.v;
+    
+    // Variables de flujo
+    ind.p.i + cap.p.i = 0;
+    ind.n.i + cap.n.i + gr.p.i = 0;
 \end{lstlisting}
 \end{columns}
 \end{frame}
 
-\end{document}
+\section{Simulaci\'on y problemas}
 
+\begin{frame}[fragile]
+\frametitle{Simulaci\'on de Modelos Modelica} 
+    \begin{figure}
+      \centering
+      \includegraphics[scale=0.5]{Compilacion} 
+      \label{fig:proceso}
+    \end{figure}
+\end{frame}
+
+
+%% [FALTA] Esta no estoy seguro
+\begin{frame}[fragile]
+\frametitle{Simulaci\'on de Modelos Modelica} 
+ Las ecuaciones de un modelo deben ser representadas como Ecuaciones Diferenciales Ordinarias (ODE): 
+ \begin{enumerate}
+ \item \textbf{Aplanado del modelo}.
+ \item Reducci\'on de \'indices.
+ \item Ordenamiento y optimizaci\'on de ecuaciones.
+ \end{enumerate}
+ 
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Tama\~no de un modelo} 
+\begin{itemize}
+    \item Tama\~no f\'isico: Cantidad de clases, variables, ecuaciones, etc usadas.
+    \item Tama\~no l\'ogio: consideramos la dimensionalidad del modelo.
+\end{itemize}
+ 
+\uncover<2->{ 
+\begin{center} 
+    \LARGE Queremos trabajar con grandes dimensionalidades 
+\end{center}
+}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Simulaci\'on de Modelos Modelica} 
+\begin{lstlisting}[style=base]
+package Circuits
+    model LC_circuit
+        capacitor cap(v(start = 1));
+        inductor ind(L = 2);
+        Pin p1,p2,p3;
+    equation
+        connect(ind.p,p3);
+        connect(ind.p,cap.p);
+        connect(cap.n,p1);
+        connect(ind.n,p2);
+    end LC_circuit;
+    
+    model LC_line
+        @constant Integer N = 10;@
+        @LC_circuit lc[N];@
+        ground gr;
+    equation
+        connect(lc[N].p1,lc[N].p2)      
+        for i in 1:N - 1 loop
+            connect(lc[i + 1].p3,lc[i].p2);
+        end for;
+        for i in 1:N loop
+            connect(gr.p,lc[i].p1);
+        end for;
+    end LC_line;
+end Circuits;   
+\end{lstlisting}
+\end{frame}
+
+\end{document}
+    
 
 
 

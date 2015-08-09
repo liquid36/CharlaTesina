@@ -1,0 +1,48 @@
+\section{Aplanado de Modelos}
+
+\begin{frame}[fragile]
+\frametitle{Modelo Aplanado} 
+\begin{enumerate}
+\item Variables de tipo b\'asicos
+\item Carencias de clases
+
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Simulaci\'on de Modelos Modelica} 
+\begin{lstlisting}[style=base,basicstyle=\tiny]
+package Circuits
+    model LC_circuit
+        capacitor cap(v(start = 1));
+        inductor ind(L = 2);
+        Pin p1,p2,p3;
+    equation
+        connect(ind.p,p3);
+        connect(ind.p,cap.p);
+        connect(cap.n,p1);
+        connect(ind.n,p2);
+    end LC_circuit;
+    
+    model LC_line
+        @constant Integer N = 10;@
+        @LC_circuit lc[N];@
+        ground gr;
+    equation
+        connect(lc[N].p1,lc[N].p2)      
+        for i in 1:N - 1 loop
+            connect(lc[i + 1].p3,lc[i].p2);
+        end for;
+        for i in 1:N loop
+            connect(gr.p,lc[i].p1);
+        end for;
+    end LC_line;
+end Circuits;   
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Simulaci\'on de Modelos Modelica} 
+asd
+\end{frame}

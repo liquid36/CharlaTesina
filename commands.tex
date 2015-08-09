@@ -1,0 +1,38 @@
+\newcommand{\epsfile}[2] {\center{\includegraphics[width=#2cm]{#1.eps}}}
+\newcommand{\captionp}[1]{\vspace{-0.5cm}\caption{#1}}
+\newcommand{\rep}[1]{\psfrag {#1}{\tiny{$#1$}}}
+\newenvironment{program}
+{
+\small
+\begin{tabbing}\hspace{2cm}\=\hspace{.4cm}\=\hspace{.4cm}\=\hspace{.4cm}\=\hspace{.4cm}\=\\}
+{\end{tabbing}
+\normalsize
+}
+\newcommand{\dt}[1]{\frac{d#1}{dt}}
+
+
+\newcommand{\dint} {\delta_{\text{int}}}
+\newcommand{\dext} {\delta_{\text{ext}}}
+\newcommand{\V} {\vspace{.1cm}}
+\newcommand{\real}{\mathbb{R}\text{e}}
+\newcommand{\sgn}{\text{sgn}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\nx}{\|x\|}
+
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\norminf}[1] {\norm{#1}_{\infty}}
+\newcommand{\norminfabs}[1]{\norminf{\: |#1| \:}}
+\newcommand{\normeuc}[1] {\norm{#1}_2}
+
+\newenvironment{figure2}
+ {\vspace{-0.5cm}\begin{figure}\begin{tiny}}{\end{tiny} \end{figure}} 
+
+\newcommand{\captionn}[1]{\vspace{-1cm}\caption{#1}}
+
+\newcommand{\vs}{\vskip 0.5cm}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "pres_tesis"
+%%% End: 

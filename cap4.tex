@@ -1,0 +1,35 @@
+\section{Resoluci\'on de conexiones}
+
+\begin{frame}[fragile]
+\frametitle{Resoluci\'on de conexiones} 
+Esta etapa se  divide en tres secciones:
+\begin{enumerate}
+\item Generación de un grafo vectorizado a partir de los connects.
+\item Determinación de componente conexas del grafo generado.
+\item Generación de ecuaciones a partir de las soluciones del punto anterior.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{fragile}
+\frametitle{Grafo Vectorizado}
+	Imagen de ejemplo de un grafo vectorizado %%[IMG]
+\end{frame}
+
+\begin{frame}{fragile}
+\frametitle{Grafo Vectorizado}
+
+\begin{enumerate}
+\item Agregamos un nodo por cada variable. Si el flujo del conector (variable) es hacia el exterior, agregamos la variable con signo negativo. Si ya había sido agregada sin signo negativo, generamos un nuevo nodo. 
+\item Agregamos un nodo que representa a la ecuación \textit{connect}.
+\item Si la ecuación estaba dentro de un \textit{for}, etiquetamos el nodo \textit{connect} con el rango de iteración. 
+\item Agregamos dos aristas, entre cada variable y el nodo que representa al \textit{connect}.
+\item Por cada arista, si la variable asociada tiene un índice de acceso, agregamos esa referencia a la arista. 
+\item Normalizamos la variable iteradora. Es decir, llevamos a todas al mismo nombre de variable.
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{fragile}
+\frametitle{Grafo Vectorizado}
+	Poner codigo y grafo de ejemplo %%[IMG]
+\end{frame}

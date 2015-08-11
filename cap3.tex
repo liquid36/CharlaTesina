@@ -3,12 +3,40 @@
 \begin{frame}[fragile]
 \frametitle{Modelo Aplanado} 
 \begin{enumerate}
-\item Variables de tipo b\'asicos
-\item Carencias de clases
+\item Modelo monol\'itico.
+\item Variables de tipo b\'asicos.
+\item Carencias de clases.
 
 \end{enumerate}
 \end{frame}
 
+
+\begin{frame}[fragile]
+\frametitle{Algoritmo de Aplanado} 
+\begin{lstlisting}[style=base,basicstyle=\tiny]
+Flat(C):
+    @2Expand(C);@
+    foreach v in Variables(C):
+        t = @2ResolveType(v)@;
+        if isBasic(t) then 
+            ChangeType(v,t);
+        else if isClass(t) AND NOT isConnector(t) then
+            @2ApplyModification(C,t,Modification(v));@
+            Flat(t);
+            @2RemoveComposition(C,t);@  
+            if isConnector(t) then
+                ChangeType(v,t);
+            else
+                Remove(t);
+            end if;     
+        end if;     
+    end foreach;    
+    foreach e in Equations(C):  
+        @2ChangeVarName(e);@
+    foreach e in Statements(C): 
+        ChangeVarName(e);           
+\end{lstlisting}
+\end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Simulaci\'on de Modelos Modelica} 
@@ -42,7 +70,16 @@ end Circuits;
 \end{lstlisting}
 \end{frame}
 
+
+
 \begin{frame}[fragile]
-\frametitle{Simulaci\'on de Modelos Modelica} 
-asd
+\frametitle{ResolveType} 
+Determina el tipo real de una variable y sus caracter\'isticas: 
+\begin{itemize}
+	\item Definici\'on de Arreglos. 
+	\item Presencia de modificaciones.
+\end{itemize}
+
+
+
 \end{frame}

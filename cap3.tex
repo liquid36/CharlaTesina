@@ -3,43 +3,18 @@
 \begin{frame}[fragile]
 \frametitle{Modelo Aplanado} 
 \begin{enumerate}
-\item Modelo monol\'itico.
-\item Variables de tipo b\'asicos.
+\item Modelo monolítico.
 \item Carencias de clases.
+\item Variables de tipo básicos.
+\item No posee ecuaciones \textit{connect}.
+
+%% Todos esto es requerido para poder simularlo
 
 \end{enumerate}
 \end{frame}
 
-
 \begin{frame}[fragile]
-\frametitle{Algoritmo de Aplanado} 
-\begin{lstlisting}[style=base,basicstyle=\tiny]
-Flat(C):
-    @2Expand(C);@
-    foreach v in Variables(C):
-        t = @2ResolveType(v)@;
-        if isBasic(t) then 
-            ChangeType(v,t);
-        else if isClass(t) AND NOT isConnector(t) then
-            @2ApplyModification(C,t,Modification(v));@
-            Flat(t);
-            @2RemoveComposition(C,t);@  
-            if isConnector(t) then
-                ChangeType(v,t);
-            else
-                Remove(t);
-            end if;     
-        end if;     
-    end foreach;    
-    foreach e in Equations(C):  
-        @2ChangeVarName(e);@
-    foreach e in Statements(C): 
-        ChangeVarName(e);           
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Simulaci\'on de Modelos Modelica} 
+\frametitle{Simulación de Modelos Modelica} 
 \begin{lstlisting}[style=base,basicstyle=\tiny]
 package Circuits
     model LC_circuit
@@ -70,16 +45,235 @@ end Circuits;
 \end{lstlisting}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Algoritmo de Aplanado} 
+\begin{lstlisting}[style=base,basicstyle=\tiny]
+Flat(C):
+    @2Expand(C);@
+    foreach v in Variables(C):
+        t = @2ResolveType(v)@;
+        if isBasic(t) then 
+            ChangeType(v,t);
+        else if isClass(t) AND NOT isConnector(t) then
+            @2ApplyModification(C,t,Modification(v));@
+            Flat(t);
+            @2RemoveComposition(C,t);@  
+            if isConnector(t) then
+                ChangeType(v,t);
+            else
+                Remove(t);
+            end if;     
+        end if;     
+    end foreach;    
+    foreach e in Equations(C):  
+        @2ChangeVarName(e);@
+    foreach e in Statements(C): 
+        ChangeVarName(e);           
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Expand} 
+\begin{huge}
+Eliminación de Herencia de clases
+\end{huge} \\
+La clase hijo hereda las variables y ecuaciones del padre
+ 
+\pause 
+\begin{columns} 
+\column[t]{.5\textwidth}   
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+model OnePort
+    Pin p;
+    Pin n;
+    Real v;
+    Real i;
+equation
+    v = p.v - n.v;
+    i = p.i;
+    i = -n.i;
+end OnePort;
+model Capacitor
+    extends OnePort;
+    parameter Real C = 1;
+equation
+    C * der(v) = i;
+end Capacitor;
+\end{lstlisting} 
+\pause
+\column[t]{.5\textwidth}  
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+model Capacitor 
+    @2Pin p;@2
+    @2Pin n;@
+    @2Real v;@
+    @2Real i;@2
+    parameter Real C = 1;
+equation
+    @2v = p.v - n.v;@
+    @2i = p.i;@
+    @2i = -n.i;@
+    C * der(v) = i;
+end Capacitor;
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
 
 
 \begin{frame}[fragile]
 \frametitle{ResolveType} 
-Determina el tipo real de una variable y sus caracter\'isticas: 
+Determina el tipo real de una variable y sus características: 
 \begin{itemize}
-	\item Definici\'on de Arreglos. 
-	\item Presencia de modificaciones.
+    \item Prefijos de Tipos.
+    \item Definición de Arreglos. 
+    \item Presencia de modificaciones.
 \end{itemize}
 
+\begin{enumerate}
+\item Buscar en la clase.
+\item Si no esta, subo al padre. Repito.
+\item Si es sinónimo, aplico ResolveType al nuevo nombre.
+\item Devuelvo el tipo encontrado.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{ResolveType: Ejemplo} 
+Definición de \textit{Voltage}
+\begin{lstlisting}[style=base,literate={=}{$\leftarrow{}$}{1}{==}{$={}$}{1},escapechar=|,basicstyle=\scriptsize]
+package Circuits |\only<3->{\color{blue}$\leftarrow$}|
+    @4model Capacitor@
+        extends OnePort;
+        parameter Real C = 1;
+    equation
+        C * der(v) = i;
+    end Capacitor;
+    
+    model LC_circuit |\only<2>{\color{blue}$\leftarrow$}|
+        @Capacitor cap(v(start = 1));@
+        inductor ind(L = 2);
+        Pin p1,p2,p3;
+    equation
+        connect(ind.p,p3);
+        connect(ind.p,cap.p);
+        connect(cap.n,p1);
+        connect(ind.n,p2);
+    end LC_circuit;
+end Circuits;
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{ApplyModification} 
+\begin{enumerate}
+\item Expandir la clase.
+\item Buscar variable y agregar modificaciones.
+\end{enumerate}
+
+    Capacitor c (C=5,v(start=2))
+\pause
+\begin{columns} 
+\column[t]{.5\textwidth}  
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+model Capacitor 
+    Pin p;
+    Pin n;
+    Real v;
+    Real i;
+    parameter Real C = 1;
+equation
+    v = p.v - n.v;
+    i = p.i;
+    i = -n.i;
+    C * der(v) = i;
+end Capacitor;
+\end{lstlisting}
+\column[t]{.5\textwidth}  
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+model Capacitor 
+    Pin p;
+    Pin n;
+    Real v @(start=2)@;
+    Real i;
+    parameter Real @C = 5@;
+equation
+    v = p.v - n.v;
+    i = p.i;
+    i = -n.i;
+    C * der(v) = i;
+end Capacitor;
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Remove Composition} 
+\begin{enumerate}
+\item Elimina instancia de clase.
+\item Añade las variables y ecuaciones internas.
+\item Renombrar las variables.
+\item Si la instancia está vectorizada: 
+    \begin{enumerate}
+    \item Agrega las variables vectorizadas.
+    \item Encapsulamos las ecuaciones dentro de una ecuación \textit{for}.
+    \end{enumerate} 
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Remove Composition: Variables} 
+\begin{enumerate}
+\item Agregamos un prefijo al nombre de las variables: "nombreInstancia\_".
+\item Mantenemos prefijos de variable. 
+\item Mantenemos las definiciones de arreglos y agregamos nuevas si la instancia lo está.   
+\end{enumerate}
+
+\pause
+\begin{columns} 
+\column[t]{.5\textwidth}  
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+model Capacitor 
+    Real p_v;
+    flow Real p_i;
+    Real n_v;
+    flow Real n_i; 
+    Real v;
+    Real i;
+    parameter Real C = 1;
+equation 
+    ...
+end Capacitor;
+model LC_circuit
+    @capacitor cap(v(start = 1));@
+    inductor ind(L = 2);
+    Pin p1,p2,p3;
+equation
+    ...
+end LC_circuit;
+\end{lstlisting}
+\column[t]{.5\textwidth}  
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+model LC_circuit
+    @2Real cap_p_v;@
+    @2flow Real cap_p_i;@
+    @2Real cap_n_v;@
+    @2flow Real cap_n_i;@ 
+    @2Real cap_v (start = 1);@
+    @2Real cap_i;@
+    @2parameter Real cap_C = 1;@
+    
+    inductor ind(L = 2);
+    Pin p1,p2,p3;
+equation
+    ...
+end LC_circuit;
+\end{lstlisting}
+\end{columns}
 
 
 \end{frame}
+
+

@@ -3,7 +3,7 @@
 {
   %%\usetheme{Copenhagen}
   \usetheme{Warsaw}
-  \setbeamercovered{transparent}
+  %%\setbeamercovered{transparent}
 }
 
 \setcounter{tocdepth}{1}
@@ -14,7 +14,7 @@
     \tableofcontents[currentsection,currentsubsection]
   \end{frame}
 }
-\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage{times}
 \usepackage[T1]{fontenc}
 \usepackage[scanall]{psfrag}
@@ -29,9 +29,11 @@
                     numbers=left,
                     numberstyle=\tiny, numbersep=5pt,
                     breaklines=true,
-                    tabsize=2, captionpos=b , stepnumber=1 , aboveskip=20pt,
+                    tabsize=2, captionpos=b , stepnumber=1,aboveskip=0pt, belowskip=0pt,
                     moredelim=**[is][\color{red}]{@}{@},
-                    moredelim=**[is][\color{blue}]{@2}{@}
+                    moredelim=**[is][\color{blue}]{@2}{@},
+                    moredelim=**[is][\only<4->{\color{green}}]{@4}{@},
+                    moredelim=**[is][\only<5->{\color{blue}}]{@5}{@},
         }
 
 \title{Aplanado eficiente de grandes modelos Modelica}
@@ -52,23 +54,23 @@
 
 \begin{frame}{Motivaciones}
     \begin{itemize}
-     \item Modelado, Simulaci\'on y Control en Tiempo Real con Aplicaciones en Electr\'onica de Potencia.
-     \item Simulaci\'on en paralelo utilizando los m\'etodos de cuantificaci\'on de estado.  
+     \item Modelado, Simulación y Control en Tiempo Real con Aplicaciones en Electrónica de Potencia.
+     \item Simulación en paralelo utilizando los métodos de cuantificación de estado.  
      \item Modelos grandes.
      \item Aprovechar las ventajas de Modelica.
     \end{itemize}
 \end{frame}
 
-\section{Introducci\'on a Modelica}
+\section{Introducción a Modelica}
 
 \begin{frame}{Modelica} 
     \begin{itemize}
         \item Orientado a Objetos.
-        \item Modelado de sistemas complejos, con componentes mec\'anicos, el\'ectricos, electr\'onicos, hidr\'aulicos, t\'ermicos, etc.     
-        \item Desarrollado por la asociaci\'on sin fines de lucro ``Modelica Asociation''.
+        \item Modelado de sistemas complejos, con componentes mecánicos, eléctricos, electrónicos, hidráulicos, térmicos, etc.     
+        \item Desarrollado por la asociación sin fines de lucro ``Modelica Asociation''.
         \item Entornos de desarrollo: OpenModelica, MathModelica, Dymola, etc.
         
-        \item El modelo esta en texto plano
+        \item El modelo está en texto plano
     \end{itemize}
 \end{frame}
  
@@ -79,8 +81,8 @@
 \column{.5\textwidth}  
 \begin{itemize}
     \item Define un objeto.
-    \item Son instanciadas mediante la definici\'on de variables.
-    \item Tienen tres secci\'ones:
+    \item Son instanciadas mediante la definición de variables.
+    \item Tienen tres secciones:
         \begin{enumerate}
             \item Definiciones.
             \item Ecuaciones.
@@ -105,7 +107,7 @@
 \frametitle{Prefijos de Clases} 
 Prefijos de clase: \textit{model}, \textit{record}, \textit{block}, \textit{connector}, \textit{function}, \textit{package}
 \begin{itemize}
-    \item Mejoran la lectura del c\'odigo:
+    \item Mejoran la lectura del código:
     \item Agregan restricciones a la clase
 \end{itemize}   
 
@@ -150,8 +152,8 @@ Prefijos de clase: \textit{model}, \textit{record}, \textit{block}, \textit{conn
 \column[t]{.5\textwidth}  
 
 \begin{itemize}
-    \item Agrega significado semantico al modelo.
-    \item Facilita la reutilizaci\'on de c\'odigo.
+    \item Agrega significado semántico al modelo.
+    \item Facilita la reutilización de código.
     \item Se utiliza la palabra reservada: \textit{extends}.
 \end{itemize} 
 
@@ -182,9 +184,9 @@ end Capacitor;
 \begin{columns}  
 \column[t]{8cm}
     \begin{itemize}
-        \item Tipos b\'asicos: \textit{Real}, \textit{Integer}, \textit{Boolean} y \textit{String}
+        \item Tipos básicos: \textit{Real}, \textit{Integer}, \textit{Boolean} y \textit{String}
         \item Las clases definen un nuevo tipo.
-        \item Sin\'onimos de tipos: \\ 
+        \item Sinónimos de tipos: \\ 
               type Nombre = [Prefijos] Tipo-Existente [Array] [Modificaciones]
     \end{itemize} 
 
@@ -210,9 +212,9 @@ end Circuits;
 \frametitle{Definiciones de variables} 
 \begin{enumerate}
 \item \textbf{Prefijos de tipos}: \textit{flow}, \textit{constant}, \textit{parameter}, \textit{discrete}, \textit{input} y \textit{output}.
-\item \textbf{Tipo}: Nombre del tipo de la variable. Puede ser un tipo b\'asico, una clase o un sin\'onimo de tipo.  Ejemplo: \textit{Real}, \textit{String}, \textit{Pin}, \textit{TenPin}.
+\item \textbf{Tipo}: Nombre del tipo de la variable. Puede ser un tipo básico, una clase o un sinónimo de tipo.  Ejemplo: \textit{Real}, \textit{String}, \textit{Pin}, \textit{TenPin}.
 \item \textbf{Nombre de la variable}. 
-\item \textbf{Dimensi\'on}: Modelica permite la definici\'on de arreglos.
+\item \textbf{Dimensión}: Modelica permite la definición de arreglos.
 \item \textbf{Modificaciones}.
 \end{enumerate}
 \begin{lstlisting}[style=base]
@@ -233,7 +235,7 @@ end Circuits;
 Aparecen en: 
 \begin{enumerate}
     \item Declaraciones de variables.
-    \item Sin\'onimo de tipo.
+    \item Sinónimo de tipo.
     \item Definiciones de herencia.
 \end{enumerate} 
 
@@ -241,8 +243,8 @@ Se permite:
 \begin{enumerate}
     \item Cambiar el valor inicial de una variable.
     \item Anidar modificaciones.
-    \item Alterar la definici\'on de una variable.
-    \item Cambiar la definici\'on de un tipo.
+    \item Alterar la definición de una variable.
+    \item Cambiar la definición de un tipo.
 \end{enumerate}
 \column[T]{7cm}
 \begin{lstlisting}[style=base]
@@ -271,7 +273,7 @@ end Circuits;
 \begin{frame}[fragile]
 \frametitle{Ecuaciones de igualdad} 
 
-Las ecuaciones no representan una asignaci\'on, sino igualdades. Pueden tener expresiones complejas de ambos lados de la igualdad y expresan una relaci\'on entre las variables. Se definen dentro de la secci\'on \textit{equation}.
+Las ecuaciones no representan una asignación, sino igualdades. Pueden tener expresiones complejas de ambos lados de la igualdad y expresan una relación entre las variables. 
 
 \begin{columns}  
 \column[t]{8cm}
@@ -282,7 +284,7 @@ Igualdades
     i = -n.i;
 \end{lstlisting} 
 \column[t]{5cm}
-Ecuac\'on For
+Ecuación For
 \begin{lstlisting}[style=base]
     for i in 1:N loop
         v[i] = p[i].v - n[i].v;
@@ -305,7 +307,7 @@ Los conectores:
 \item No tienen ecuaciones.
 \item Tienen variables de dos tipos:
     \begin{enumerate}
-        \item Variables de potencial. Ejemplo: presi\'on, voltaje, etc. 
+        \item Variables de potencial. Ejemplo: presión, voltaje, etc. 
         \item Variables de flujo: definidas con el prefijo flow. Ejemplo: corriente, caudal, etc.
     \end{enumerate}
 \item Ejemplo: Clase \textit{Pin}.
@@ -320,8 +322,8 @@ Las ecuaciones \textit{connect}:
 \item Conectan dos clases del mismo tipo.
 \item Genera relaciones entre las variables internas de los conectores:
 \begin{itemize}
-\item Las variables de potencial dentro de una misma conexi\'on deben ser iguales entre s\'i.
-\item Las variables de flujo siguen las reglas de Kirchhoff: la suma de los flujos es igual a cero. Para mantener esta regla hay que considerar como flujo positivo aquel que tenga direcci\'on hacia dentro del componente. En caso contrario, ser\'a considerado negativo. 
+\item Las variables de potencial dentro de una misma conexión deben ser iguales entre sí.
+\item Las variables de flujo siguen las reglas de Kirchhoff: la suma de los flujos es igual a cero. Para mantener esta regla hay que considerar como flujo positivo aquel que tenga dirección hacia dentro del componente. En caso contrario, será considerado negativo. 
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -369,10 +371,10 @@ Las ecuaciones \textit{connect}:
 \end{columns}
 \end{frame}
 
-\section{Simulaci\'on y problemas}
+\section{Simulación y problemas}
 
 \begin{frame}[fragile]
-\frametitle{Simulaci\'on de Modelos Modelica} 
+\frametitle{Simulación de Modelos Modelica} 
     \begin{figure}
       \centering
       \includegraphics[scale=0.5]{Compilacion} 
@@ -387,7 +389,7 @@ Las ecuaciones \textit{connect}:
  Las ecuaciones de un modelo deben ser representadas como Ecuaciones Diferenciales Ordinarias (ODE): 
  \begin{enumerate}
  \item \textbf{Aplanado del modelo}.
- \item \textbf{Reducci\'on de las conexiones}.
+ \item \textbf{Reducción de las conexiones}.
  \end{enumerate}
  
 \end{frame}
@@ -395,8 +397,8 @@ Las ecuaciones \textit{connect}:
 \begin{frame}[fragile]
 \frametitle{Tama\~no de un modelo} 
 \begin{itemize}
-    \item Tama\~no f\'isico: Cantidad de clases, variables, ecuaciones, etc usadas.
-    \item Tama\~no l\'ogio: consideramos la dimensionalidad del modelo.
+    \item Tamaño físico: Cantidad de clases, variables, ecuaciones, etc. usadas.
+    \item Tamaño lógico: Consideramos la dimensionalidad del modelo.
 \end{itemize}
  
 \uncover<2->{ 

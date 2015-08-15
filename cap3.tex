@@ -1,53 +1,45 @@
-\section{Aplanado de Modelos}
+\section{Algoritmo de aplanado}
 
 \begin{frame}[fragile]
-\frametitle{Modelo Aplanado} 
+\frametitle{Modelo aplanado} 
+\begin{block}{Modelo aplanado}
 \begin{enumerate}
 \item Modelo monolítico.
 \item Carencias de clases.
 \item Variables de tipo básicos.
 \item No posee ecuaciones \textit{connect}.
-
-%% Todos esto es requerido para poder simularlo
-
 \end{enumerate}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Algoritmo de aplanado} 
+Esta dividido en dos etapas:
+\begin{block}{Reducción de composiciones}
+\begin{enumerate}
+\item Expansión de herencia.
+\item Simplificación de tipos.
+\item Aplicación de modificaciones.
+\item Reducción de instancias. 
+\end{enumerate}
+\end{block}
+
+\begin{block}{Resolución de conexiones}
+Descomposición de ecuaciones \textit{connect} en ecuaciones simples.
+\end{block}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Simulación de Modelos Modelica} 
-\begin{lstlisting}[style=base,basicstyle=\tiny]
-package Circuits
-    model LC_circuit
-        capacitor cap(v(start = 1));
-        inductor ind(L = 2);
-        Pin p1,p2,p3;
-    equation
-        connect(ind.p,p3);
-        connect(ind.p,cap.p);
-        connect(cap.n,p1);
-        connect(ind.n,p2);
-    end LC_circuit;
-    
-    model LC_line
-        @constant Integer N = 10;@
-        @LC_circuit lc[N];@
-        ground gr;
-    equation
-        connect(lc[N].p1,lc[N].p2)      
-        for i in 1:N - 1 loop
-            connect(lc[i + 1].p3,lc[i].p2);
-        end for;
-        for i in 1:N loop
-            connect(gr.p,lc[i].p1);
-        end for;
-    end LC_line;
-end Circuits;   
-\end{lstlisting}
+\frametitle{Algoritmo de aplanado} 
+\begin{center}
+\huge Reducción de composiciones
+\end{center}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Algoritmo de Aplanado} 
-\begin{lstlisting}[style=base,basicstyle=\tiny]
+\frametitle{Algoritmo de Aplanado - Reducción de composiciones} 
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
 Flat(C):
     @2Expand(C);@
     foreach v in Variables(C):
@@ -66,19 +58,17 @@ Flat(C):
         end if;     
     end foreach;    
     foreach e in Equations(C):  
-        @2ChangeVarName(e);@
-    foreach e in Statements(C): 
-        ChangeVarName(e);           
+        @2ChangeVarName(e);@     
 \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Expand} 
-\begin{huge}
-Eliminación de Herencia de clases
-\end{huge} \\
-La clase hijo hereda las variables y ecuaciones del padre
- 
+\frametitle{Expansión de herencias de clases} 
+
+\begin{block} {}
+La clase hijo hereda las variables y ecuaciones del padre.
+\end{block}
+
 \pause 
 \begin{columns} 
 \column[t]{.5\textwidth}   
@@ -120,27 +110,17 @@ end Capacitor;
 \end{frame}
 
 
-
 \begin{frame}[fragile]
-\frametitle{ResolveType} 
+\frametitle{Simplificación de tipos - ResolveType} 
+\begin{block}{}
 Determina el tipo real de una variable y sus características: 
 \begin{itemize}
     \item Prefijos de Tipos.
     \item Definición de Arreglos. 
     \item Presencia de modificaciones.
 \end{itemize}
-
-\begin{enumerate}
-\item Buscar en la clase.
-\item Si no esta, subo al padre. Repito.
-\item Si es sinónimo, aplico ResolveType al nuevo nombre.
-\item Devuelvo el tipo encontrado.
-\end{enumerate}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{ResolveType: Ejemplo} 
-Definición de \textit{Voltage}
+\end{block}
+\pause
 \begin{lstlisting}[style=base,literate={=}{$\leftarrow{}$}{1}{==}{$={}$}{1},escapechar=|,basicstyle=\scriptsize]
 package Circuits |\only<3->{\color{blue}$\leftarrow$}|
     @4model Capacitor@
@@ -155,10 +135,7 @@ package Circuits |\only<3->{\color{blue}$\leftarrow$}|
         inductor ind(L = 2);
         Pin p1,p2,p3;
     equation
-        connect(ind.p,p3);
-        connect(ind.p,cap.p);
-        connect(cap.n,p1);
-        connect(ind.n,p2);
+        ...
     end LC_circuit;
 end Circuits;
 \end{lstlisting}
@@ -166,13 +143,15 @@ end Circuits;
 
 
 \begin{frame}[fragile]
-\frametitle{ApplyModification} 
+\frametitle{Aplicación de modificaciones - ApplyModification} 
+\begin{block}{}
 \begin{enumerate}
 \item Expandir la clase.
-\item Buscar variable y agregar modificaciones.
+\item Agregar las modificaciones a la variable correspondiente.
 \end{enumerate}
-
-    Capacitor c (C=5,v(start=2))
+\end{block}
+\pause
+Capacitor c (C=5,v(start=2))
 \pause
 \begin{columns} 
 \column[t]{.5\textwidth}  
@@ -209,71 +188,164 @@ end Capacitor;
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Remove Composition} 
+\frametitle{Reducción de instancias - RemoveComposition} 
+\begin{block}{RemoveComposition}
 \begin{enumerate}
-\item Elimina instancia de clase.
+\item Reemplaza las instancias de clases (previamente aplanada).
 \item Añade las variables y ecuaciones internas.
-\item Renombrar las variables.
+\item Renombrar las variables añadidas.
 \item Si la instancia está vectorizada: 
     \begin{enumerate}
     \item Agrega las variables vectorizadas.
     \item Encapsulamos las ecuaciones dentro de una ecuación \textit{for}.
     \end{enumerate} 
 \end{enumerate}
+\end{block}
+\end{frame}
 
+\begin{frame}[fragile,t]
+\frametitle{RemoveComposition} 
+\begin{block}{Variables}
+\begin{enumerate}
+\item Agrega un prefijo al nombre de las variables: "nombreInstancia\_".
+\item Mantiene los prefijos de tipos de las  variable. 
+\item Mantiene las definiciones de arreglos y agrega nuevas si la instancia lo está.   
+\end{enumerate}
+\end{block}
+
+\begin{block}{Ecuaciones}
+\begin{enumerate}
+\item Renombra las variables que correspondan.
+\item Reemplaza el operador ''.'' por guiónes.
+\item Encapsula las ecuaciones en un \textit{for} si la instancia esta vectorizada.
+\end{enumerate}
+\end{block}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Remove Composition: Variables} 
-\begin{enumerate}
-\item Agregamos un prefijo al nombre de las variables: "nombreInstancia\_".
-\item Mantenemos prefijos de variable. 
-\item Mantenemos las definiciones de arreglos y agregamos nuevas si la instancia lo está.   
-\end{enumerate}
-
-\pause
-\begin{columns} 
-\column[t]{.5\textwidth}  
+\frametitle{Algoritmo de Aplanado - Reducción de composiciones} 
 \begin{lstlisting}[style=base,basicstyle=\scriptsize]
-model Capacitor 
-    Real p_v;
-    flow Real p_i;
-    Real n_v;
-    flow Real n_i; 
-    Real v;
-    Real i;
-    parameter Real C = 1;
-equation 
-    ...
-end Capacitor;
-model LC_circuit
-    @capacitor cap(v(start = 1));@
-    inductor ind(L = 2);
-    Pin p1,p2,p3;
-equation
-    ...
-end LC_circuit;
+Flat(C):
+    @2Expand(C);@
+    foreach v in Variables(C):
+        t = @2ResolveType(v)@;
+        if isBasic(t) then 
+            ChangeType(v,t);
+        else if isClass(t) AND NOT isConnector(t) then
+            @2ApplyModification(C,t,Modification(v));@
+            Flat(t);
+            @2RemoveComposition(C,t);@  
+            if isConnector(t) then
+                ChangeType(v,t);
+            else
+                Remove(t);
+            end if;     
+        end if;     
+    end foreach;    
+    foreach e in Equations(C):  
+        @2ChangeVarName(e);@     
 \end{lstlisting}
-\column[t]{.5\textwidth}  
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{RemoveComposition: Ejemplos}
+\begin{columns} 
+\column[t]{7cm}  
 \begin{lstlisting}[style=base,basicstyle=\scriptsize]
-model LC_circuit
-    @2Real cap_p_v;@
-    @2flow Real cap_p_i;@
-    @2Real cap_n_v;@
-    @2flow Real cap_n_i;@ 
-    @2Real cap_v (start = 1);@
-    @2Real cap_i;@
-    @2parameter Real cap_C = 1;@
+package Circuits
+    @2model LC_circuit@
+        Pin p1,p2,p3;
+    equation
+        p1.v = p2.v;
+        p2.v = p3.v;
+    end LC_circuit;
     
-    inductor ind(L = 2);
-    Pin p1,p2,p3;
-equation
-    ...
-end LC_circuit;
+    model LC_line
+        constant Integer N = 10;
+        LC_circuit lc[N];
+        ground gr;
+    equation
+        connect(lc[N].p1,lc[N].p2)      
+        for i in 1:N - 1 loop
+            connect(lc[i + 1].p3,lc[i].p2);
+        end for;
+        for i in 1:N loop
+            connect(gr.p,lc[i].p1);
+        end for;
+    end LC_line;
+end Circuits;
+\end{lstlisting}
+
+\column[t]{7cm}  
+\begin{lstlisting}[style=base]
+package Circuits
+    model LC_circuit
+        Pin p1,p2,p3;
+        flow Real p1_i,p2_i,p3_i;
+        Real p1_v,p2_v,p3_v;
+    equation
+        p1_v = p2_v;
+        p2_v = p3_v;
+    end LC_circuit;
+end Circuits;
 \end{lstlisting}
 \end{columns}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{RemoveComposition: Ejemplos}
+\begin{columns} 
+\column[t]{7cm}  
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+    model LC_circuit
+        Pin p1,p2,p3;
+        flow Real p1_i,p2_i,p3_i;
+        Real p1_v,p2_v,p3_v;
+    equation
+        p1_v = p2_v;
+        p2_v = p3_v;
+    end LC_circuit;
+    
+    model LC_line
+        constant Integer N = 10;
+        @2LC_circuit lc[N];@
+        ground gr;
+    equation
+        connect(lc[N].p1,lc[N].p2)      
+        for i in 1:N - 1 loop
+            connect(lc[i + 1].p3,lc[i].p2);
+        end for;
+        for i in 1:N loop
+            connect(gr.p,lc[i].p1);
+        end for;
+    end LC_line;
+\end{lstlisting}
 
+\column[t]{8cm}  
+\begin{lstlisting}[style=base,basicstyle=\scriptsize]
+package Circuits
+    model LC_line
+        constant Integer N = 10;
+        Pin p1[N],p2[N],p3[N];
+        flow Real lc_p1_i[N],lc_p2_i[N],lc_p3_i[N];
+        Real lc_p1_v[N],lc_p2_v[N],lc_p3_v[N];
+        ground gr;
+    equation
+        for i in 1:N - 1 loop
+            p1_v[N] = p2_v[N];
+            p2_v[N] = p3_v[N];
+        end for;
+        connect(lc_p1[N],lc_p2[N])      
+        for i in 1:N - 1 loop
+            connect(lc_p3[i + 1],lc_p2[i]);
+        end for;
+        for i in 1:N loop
+            connect(gr_p[i],lc_p1[i]);
+        end for;
+    end LC_line;
+end Circuits;
+\end{lstlisting}
+\end{columns}
 \end{frame}
 
 

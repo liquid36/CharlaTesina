@@ -26,7 +26,7 @@
 
 \lstdefinestyle{base}{  breaklines=true,
                     basicstyle=\footnotesize,
-                    numbers=left,
+                    numbers=none,
                     numberstyle=\tiny, numbersep=5pt,
                     breaklines=true,
                     tabsize=2, captionpos=b , stepnumber=1,aboveskip=0pt, belowskip=0pt,
@@ -50,27 +50,39 @@
 \end{frame}
 
  
-\section{Motivaciones}  
+\section{Motivaciones y Objetivos}  
 
 \begin{frame}{Motivaciones}
     \begin{itemize}
      \item Modelado, Simulación y Control en Tiempo Real con Aplicaciones en Electrónica de Potencia.
-     \item Simulación en paralelo utilizando los métodos de cuantificación de estado.  
-     \item Modelos grandes.
-     \item Aprovechar las ventajas de Modelica.
+     \item Trabajar con sistemas a grandes escalas.
+     \item Simulación en paralelo utilizando los métodos de cuantificación de estado.       
+     \item Aprovechar las ventajas de Modelica para describir modelos grandes.
     \end{itemize}
 \end{frame}
 
-\section{Introducción a Modelica}
+\begin{frame}{Objetivos}
+    \begin{itemize}
+     \item Mantener las caracteristicas de Modelica en las sucesivas etapas de compilación.
+     \item Especificamente, en la etapa de Aplanado.
+     \item Mantener definiciones de arreglos y ecuaciones \textit{for} en:
+        \begin{enumerate}
+            \item Reducción de clases.
+            \item Resolución de conexiones.
+        \end{enumerate}
+    \end{itemize}
+\end{frame}
+
+\section{Conceptos Previos}
 
 \begin{frame}{Modelica} 
     \begin{itemize}
-        \item Orientado a Objetos.
+        \item Lenguaje de modelado orientado a objetos.
         \item Modelado de sistemas complejos, con componentes mecánicos, eléctricos, electrónicos, hidráulicos, térmicos, etc.     
-        \item Desarrollado por la asociación sin fines de lucro ``Modelica Asociation''.
+        \item Desarrollado por la asociación sin fines de lucro ``Modelica Asociation''.        
+        \item Los modelo son descriptos en texto plano.        
         \item Entornos de desarrollo: OpenModelica, MathModelica, Dymola, etc.
-        
-        \item El modelo está en texto plano
+        \item Librería con componentes ya definidos.
     \end{itemize}
 \end{frame}
  
@@ -79,6 +91,7 @@
 \frametitle{Clases} 
 \begin{columns}  
 \column{.5\textwidth}  
+\begin{block}{}
 \begin{itemize}
     \item Define un objeto.
     \item Son instanciadas mediante la definición de variables.
@@ -88,12 +101,14 @@
             \item Ecuaciones.
             \item Sentencias.
         \end{enumerate}
+    \item Clases especializadas:  \textit{model}, \textit{record}, \textit{block}, \textit{connector}, \textit{function}, \textit{package}   
 \end{itemize}
-
+\end{block}{}
 \column{.5\textwidth}
 \begin{lstlisting}[style=base]
     class X
-        // Definiciones de variables y clases   
+        // Definiciones de 
+                variables y clases   
     equation
         // Ecuaciones
     statements
@@ -103,61 +118,70 @@
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Prefijos de Clases} 
-Prefijos de clase: \textit{model}, \textit{record}, \textit{block}, \textit{connector}, \textit{function}, \textit{package}
-\begin{itemize}
-    \item Mejoran la lectura del código:
-    \item Agregan restricciones a la clase
-\end{itemize}   
+%\begin{frame}[fragile]
+%\frametitle{Prefijos de Clases} 
+%Prefijos de clase: \textit{model}, \textit{record}, \textit{block}, \textit{connector}, \textit{function}, \textit{package}
+%\begin{itemize}
+%    \item Mejoran la lectura del código:
+%    \item Agregan restricciones a la clase
+%\end{itemize}   
+%
+%\begin{columns}  
+%\column{.5\textwidth}  
+%\begin{lstlisting}[style=base]
+%    class Circuits
+%        cclass Pin
+%            Real v;
+%            flow Real i;
+%        end Pin;
+%        class Componente
+%            Pin n,p;
+%        equation 
+%            n.v = p.v;
+%        end Componente; 
+%    end Circuits;   
+%\end{lstlisting}
+%\par
+%\column{.5\textwidth}
+%\begin{lstlisting}[style=base]
+%    @package@ Circuits
+%        @connector@ Pin
+%            Real v;
+%            flow Real i;
+%        end Pin;
+%        @model@ Componente
+%            Pin n,p;
+%        equation 
+%            n.v = p.v;
+%        end Componente; 
+%    end Circuits;   
+%\end{lstlisting}
+%\par
+%\end{columns}
+%\end{frame}
 
-\begin{columns}  
-\column{.5\textwidth}  
-\begin{lstlisting}[style=base]
-    class Circuits
-        cclass Pin
-            Real v;
-            flow Real i;
-        end Pin;
-        class Componente
-            Pin n,p;
-        equation 
-            n.v = p.v;
-        end Componente; 
-    end Circuits;   
-\end{lstlisting}
-\par
 
-\column{.5\textwidth}
-\begin{lstlisting}[style=base]
-    @package@ Circuits
-        @connector@ Pin
-            Real v;
-            flow Real i;
-        end Pin;
-        @model@ Componente
-            Pin n,p;
-        equation 
-            n.v = p.v;
-        end Componente; 
-    end Circuits;   
-\end{lstlisting}
-\par
-\end{columns}
-\end{frame}
+
+
 
 \begin{frame}[fragile]
 \frametitle{Herencias de Clases} 
 \begin{columns}  
-\column[t]{.5\textwidth}  
+\column[t]{8cm}  
 
+\begin{block}{}
 \begin{itemize}
     \item Agrega significado semántico al modelo.
     \item Facilita la reutilización de código.
     \item Se utiliza la palabra reservada: \textit{extends}.
 \end{itemize} 
+\end{block}
 
-\column[t]{.5\textwidth}  
+\begin{block}{}
+La clase hijo obtiene las caracteristicas del padre.
+\end{block}
+
+\column[t]{5cm}  
 \begin{lstlisting}[style=base]
 model OnePort
     Pin p;
@@ -180,17 +204,16 @@ end Capacitor;
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Declaraciones de tipo} 
+\frametitle{Tipos de Variables} 
 \begin{columns}  
-\column[t]{8cm}
+\column[t]{9cm}
     \begin{itemize}
-        \item Tipos básicos: \textit{Real}, \textit{Integer}, \textit{Boolean} y \textit{String}
+        \item \textbf{Tipos básicos}: \textit{Real}, \textit{Integer}, \textit{Boolean} y \textit{String}
         \item Las clases definen un nuevo tipo.
-        \item Sinónimos de tipos: \\ 
+        \item \textbf{Sinónimos de tipos}: \\ 
               type Nombre = [Prefijos] Tipo-Existente [Array] [Modificaciones]
+        \item \textbf{Prefijos de Tipo}: \textit{flow}, \textit{constant}, \textit{parameter}, \textit{discrete}, \textit{input} y \textit{output}.
     \end{itemize} 
-
-Prefijos de Tipo: \textit{flow}, \textit{constant}, \textit{parameter}, \textit{discrete}, \textit{input} y \textit{output}.
 
 \column[t]{5cm}
 \begin{lstlisting}[style=base]
@@ -232,20 +255,22 @@ end Circuits;
 
 \begin{columns}  
 \column[T]{7cm}
-Aparecen en: 
+\begin{block}{Aparecen en}
 \begin{enumerate}
     \item Declaraciones de variables.
     \item Sinónimo de tipo.
     \item Definiciones de herencia.
 \end{enumerate} 
+\end{block}
 
-Se permite:
+\begin{block}{Podemos}
 \begin{enumerate}
-    \item Cambiar el valor inicial de una variable.
-    \item Anidar modificaciones.
-    \item Alterar la definición de una variable.
+    \item Cambiar el valor inicial de una variable.    
+    \item Redefinir una variable.
     \item Cambiar la definición de un tipo.
+    \item Anidar modificaciones.
 \end{enumerate}
+\end{block}
 \column[T]{7cm}
 \begin{lstlisting}[style=base]
 package Circuits
@@ -260,8 +285,8 @@ package Circuits
     end CircuitX;
     model MainCircuit
         Capacitor x(C = 2);
-        CircuitOne co1 (cap(C = 10));
-        CircuitOne co2 (cap(C = 15));
+        CircuitX co1 (cap(C = 10));
+        CircuitX co2 (cap(C = 15));
     end MainCircuit;
 end Circuits;
 \end{lstlisting}
@@ -270,109 +295,123 @@ end Circuits;
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Ecuaciones de igualdad} 
-
-Las ecuaciones no representan una asignación, sino igualdades. Pueden tener expresiones complejas de ambos lados de la igualdad y expresan una relación entre las variables. 
-
+\begin{frame}[fragile,t]
+\frametitle{Ecuaciones} 
+\begin{block}{}
+Las ecuaciones no representan una asignación, sino igualdades.\\ Pueden tener expresiones complejas de ambos lados de la igualdad y expresan una relación entre las variables.
+\end{block}
+\vspace{0.1cm}
 \begin{columns}  
-\column[t]{8cm}
-Igualdades
+\column[t]{4cm}
+Ecuaciones de Igualdad
+\vspace{0.2cm}
 \begin{lstlisting}[style=base]
-    p.v - n.v = v;
-    i = p.i;
-    i = -n.i;
+
+p.v - n.v = v;
+i = p.i;
+i = -n.i;
 \end{lstlisting} 
 \column[t]{5cm}
-Ecuación For
+Ecuación \textit{for}
+\vspace{0.2cm}
 \begin{lstlisting}[style=base]
-    for i in 1:N loop
-        v[i] = p[i].v - n[i].v;
-        i[i] = p[i].i;
-        i[i] = -n[i].i;
-        C[i] * der(v[i]) = i;
-    end for;
+for i in 1:N loop
+    v[i] = p[i].v - n[i].v;
+    i[i] = p[i].i;
+    i[i] = -n[i].i;
+    C[i] * der(v[i]) = i;
+end for;
+\end{lstlisting} 
+\column[t]{4cm} 
+N = 4
+\vspace{0.2cm}
+\begin{lstlisting}[style=base]
+v[1] = p[1].v - n[1].v;       
+v[2] = p[2].v - n[2].v;
+v[3] = p[3].v - n[3].v;
+v[4] = p[4].v - n[4].v;
 \end{lstlisting} 
 \end{columns}
-
-
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Ecuaciones Connect} 
-Los conectores:
+\frametitle{Ecuaciones \textit{connect}} 
+\begin{block}{Conectores}
 \begin{itemize}
 \item Son clases con ciertas restricciones.
 \item Se definen con el prefijo \textit{connector}.
 \item No tienen ecuaciones.
 \item Tienen variables de dos tipos:
-    \begin{enumerate}
+    \begin{itemize}
         \item Variables de potencial. Ejemplo: presión, voltaje, etc. 
         \item Variables de flujo: definidas con el prefijo flow. Ejemplo: corriente, caudal, etc.
-    \end{enumerate}
-\item Ejemplo: Clase \textit{Pin}.
+    \end{itemize} 
 \end{itemize}
-
+\end{block}
+\begin{block}{Ejemplo}
+Clase Pin:
+\begin{itemize}
+    \item Voltaje: Variables de potencial.
+    \item Corriente: Variables de flujo.
+\end{itemize}
+\end{block}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Ecuaciones Connect} 
-Las ecuaciones \textit{connect}: 
-\begin{itemize}
-\item Conectan dos clases del mismo tipo.
-\item Genera relaciones entre las variables internas de los conectores:
-\begin{itemize}
-\item Las variables de potencial dentro de una misma conexión deben ser iguales entre sí.
-\item Las variables de flujo siguen las reglas de Kirchhoff: la suma de los flujos es igual a cero. Para mantener esta regla hay que considerar como flujo positivo aquel que tenga dirección hacia dentro del componente. En caso contrario, será considerado negativo. 
-\end{itemize}
-\end{itemize}
-\end{frame}
+\frametitle{Ecuaciones \textit{connect}} 
+\begin{block}{Ecuaciones \textit{connect}}
+    \begin{itemize}
+        \item Conectan dos clases del mismo tipo.
+        \item Genera relaciones entre las variables internas de los conectores:
+            \begin{itemize}
+                \item Las variables de potencial dentro de una misma conexión deben ser iguales entre sí.
+                \item Las variables de flujo siguen las reglas de Kirchhoff: la suma de los flujos es igual a cero. 
+        \end{itemize}
+    \end{itemize}
+\end{block}{}
 
-\begin{frame}[fragile]
-\frametitle{Ecuaciones Connect} 
 \begin{columns}  
 \column[T]{8cm}
- \begin{lstlisting}[style=base,,basicstyle=\tiny]
-    package Circuits
-        ...
-        model ground
-            Pin p;
-        equation
-            p.v = 0;
-        end ground;
-        model inductor
-            extends OnePort;
-            parameter Real L = 1;
-        equation
-            L * der(i) = v;
-        end inductor;
-        model LC_circuit
-            Capacitor cap(v(start = 1));
-            inductor ind(L = 2);
-            ground gr;
-        equation
-            connect(ind.p,cap.p);
-            connect(ind.n,cap.n);
-            connect(cap.n,gr.p);
-        end LC_circuit;
-    end Circuits
+ \begin{lstlisting}[style=base,,basicstyle=\scriptsize]
+    model LC_circuit
+        Capacitor cap(v(start = 1));
+        inductor ind(L = 2);
+        ground gr;
+    equation
+        connect(ind.p,cap.p);
+        @connect(ind.n,cap.n);@
+        @connect(cap.n,gr.p);@
+    end LC_circuit;
 \end{lstlisting}
 \column[T]{6cm}
  \begin{lstlisting}[style=base]
-    // Variables de Potencial
-    ind.p.v = cap.p.v;
+    // Variables de Potencial 
     ind.n.v  = cap.n.v;
     cap.n.v = gr.p.v;
     
-    // Variables de flujo
-    ind.p.i + cap.p.i = 0;
+    // Variables de flujo 
     ind.n.i + cap.n.i + gr.p.i = 0;
 \end{lstlisting}
+% Mencionar que se tiene que resolver a nivel global las conexiones
 \end{columns}
 \end{frame}
 
-\section{Simulación y problemas}
 
+\begin{frame}[fragile]
+\frametitle{Tama\~nos de un modelo} 
+\begin{block}{Tamaño de la descripción}
+Consideramos la cantidad de clases, variables, ecuaciones, etc. usadas.
+\end{block}
+\vspace{1cm}
+\begin{block}{Tamaño del sistema}
+Consideramos la dimensionalidad del modelo. \\
+Cantidad total de variables. 
+\end{block}
+\end{frame}
+
+%% antes mencionar que trabajamos con modelos con arreglos y ecuaciones for
+%% Cambiar grafico por Parsing -> Flattering -> Index Reduction -> 
+%% Se hace muy grande el modelo si expandimos
 \begin{frame}[fragile]
 \frametitle{Simulación de Modelos Modelica} 
     \begin{figure}
@@ -383,31 +422,20 @@ Las ecuaciones \textit{connect}:
 \end{frame}
 
 
-%% [FALTA] Esta no estoy seguro
-\begin{frame}[fragile]
-\frametitle{Modelica Compiler} 
- Las ecuaciones de un modelo deben ser representadas como Ecuaciones Diferenciales Ordinarias (ODE): 
- \begin{enumerate}
- \item \textbf{Aplanado del modelo}.
- \item \textbf{Reducción de las conexiones}.
- \end{enumerate}
- 
-\end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Tama\~no de un modelo} 
-\begin{itemize}
-    \item Tamaño físico: Cantidad de clases, variables, ecuaciones, etc. usadas.
-    \item Tamaño lógico: Consideramos la dimensionalidad del modelo.
-\end{itemize}
- 
-\uncover<2->{ 
-\begin{center} 
-    \LARGE Queremos trabajar con grandes dimensionalidades 
-\end{center}
-}
-\end{frame}
+\frametitle{Simulación de Modelos Grandes} 
+\begin{block}{Problemas}
+Expandir las variables y ecuaciones vectorizadas provoca una perdida de eficiencia en las etapas de compilación. \\
+Imposibilidad de trabajar con sistemas de gran tamaño.
+\end{block} 
 
+\begin{block}{Objetivos}
+Algoritmo de aplanado con costo computacional constante con respecto a la dimensionalidad del modelo. \\
+Mantener las definiciones de arreglos y ecuaciones \textit{for} durante toda la etapa de compilación.
+\end{block} 
+
+\end{frame}
 
 \input{cap3}
 \input{cap4}
@@ -415,16 +443,3 @@ Las ecuaciones \textit{connect}:
 
 \end{document}
     
-\begin{comment}
-
-\begin{frame}[fragile]
-\frametitle{Declaraciones de variables} 
-\begin{columns}  
-\column[t]{8cm}
- 
-\column[t]{5cm}
- 
-\end{columns}
-\end{frame}
-
-\end{comment}

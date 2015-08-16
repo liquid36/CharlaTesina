@@ -340,7 +340,7 @@ package Circuits
             connect(lc_p3[i + 1],lc_p2[i]);
         end for;
         for i in 1:N loop
-            connect(gr_p[i],lc_p1[i]);
+            connect(gr_p,lc_p1[i]);
         end for;
     end LC_line;
 end Circuits;

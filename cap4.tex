@@ -1,35 +1,87 @@
-\section{Resolución de conexiones}
+\begin{frame}[fragile]
+\frametitle{Algoritmo de aplanado} 
+\begin{center}
+\huge Resolución de conexiones
+\end{center}
+\end{frame}
+
+
 
 \begin{frame}[fragile]
 \frametitle{Resolución de conexiones} 
-Esta etapa se  divide en tres secciones:
+\begin{block}{Resolución de conexiones}
 \begin{enumerate}
-\item Generación de un grafo vectorizado a partir de los connects.
+\item Generación de un grafo bipartito a partir de las ecuaciones \textit{connects}.
 \item Determinación de componente conexas del grafo generado.
-\item Generación de ecuaciones a partir de las soluciones del punto anterior.
+\item Generación de ecuaciones a partir de las componentes conexas.
 \end{enumerate}
+\end{block}
 \end{frame}
 
 \begin{frame}{fragile}
-\frametitle{Grafo Vectorizado}
-    Imagen de ejemplo de un grafo vectorizado %%[IMG]
-\end{frame}
-
-\begin{frame}{fragile}
-\frametitle{Grafo Vectorizado}
-
+\frametitle{Grafo bipartito}
 \begin{enumerate}
-\item Agregamos un nodo por cada variable. Si el flujo del conector (variable) es hacia el exterior, agregamos la variable con signo negativo. Si ya había sido agregada sin signo negativo, generamos un nuevo nodo. 
+\setlength\itemsep{1em}
+\item Agregamos un nodo por cada variable de la ecuación.
 \item Agregamos un nodo que representa a la ecuación \textit{connect}.
 \item Si la ecuación estaba dentro de un \textit{for}, etiquetamos el nodo \textit{connect} con el rango de iteraci\'on. 
 \item Agregamos dos aristas, entre cada variable y el nodo que representa al \textit{connect}.
 \item Por cada arista, si la variable asociada tiene un índice de acceso, agregamos esa referencia a la arista. 
-\item Normalizamos la variable iteradora. Es decir, llevamos a todas al mismo nombre de variable.
 \end{enumerate}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Grafo Bipartito: Ejemplo}
+\begin{columns} 
+\column[t]{7cm}  
+\begin{lstlisting}[style=base]
+connect(lc_p1[N],lc_p2[N])     
+ 
+for i in 1:N - 1 loop
+    connect(lc_p3[i + 1],lc_p2[i]);
+end for;
+
+for i in 1:N loop
+    connect(gr_p,lc_p1[i]);
+end for;
+\end{lstlisting}
+
+\column[t]{7cm}  
+
+\begin{tikzpicture}[>=stealth',shorten >=1pt,auto, node distance = 1.5cm,
+                    thick,main node/.style={circle,draw,font=\sffamily\bfseries}]
+ 
+  \node[main node] (1) {lc\_p1};
+  \node[main node] (2) [below of=1] {lc\_p2};
+  \node[main node] (3) [below of=2] {lc\_p3};
+  \node[main node] (4) [below of=3] {gr\_p};
+  
+  \node[main node] (5) [right of = 1,xshift=3cm ] {\{\}};
+  \node[main node] (6) [below of=5]  {1:N-1};
+  \node[main node] (7) [below of=6]  {1:N};  
+	
+  \path[every node/.style={font=\sffamily\small}] 	
+	(1) edge node [left,near start,above] {N} (5)
+        edge node[left,very near start,above] {i} (7)
+    (2) edge node [left,pos = 0.05,above] {N} (5)
+        edge node[left,very near start,below] {i} (6)  
+    (3) edge node [left,near start,above] {i + 1} (6)    
+	(4) edge node [left,near start,above] {1} (7);
+\end{tikzpicture}
+
+
+\end{columns}
 \end{frame}
 
 \begin{frame}{fragile}
-\frametitle{Grafo Vectorizado}
-    Poner codigo y grafo de ejemplo %%[IMG]
+\frametitle{Determinación de componentes conexas}
+\begin{itemize}
+\setlength\itemsep{1em}
+\item Busqueda en profundida sobre el grafo. 
+\item Cada visita a un nodo depende de las metadata del grafo.
+\item Mantenemos referencia del intervalo de acceso al nodo. 
+\item Visitamos un nodo si hay intersección entre intervalos.
+\item Podamos parte de la arista al visitar un nodo.
+\item Terminamos cuando no hay más intersección con otros nodos.
+\end{itemize}
 \end{frame}

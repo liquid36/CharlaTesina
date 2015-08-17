@@ -1,0 +1,59 @@
+\section{Implementación y Comparaciones}
+
+\begin{frame}[fragile]
+\frametitle{Implementación y Comparaciones} 
+\begin{block}{}
+\begin{enumerate}
+\item Implementados en C++.
+\item Pertenece al proyecto ModelicaCC  \footnote{http://sourceforge.net/projects/modelicacc/}, que contiene diversas herramientas para compilar los modelos y simularlos. 
+\item Realizamos pruebas de performance en varios ejemplos variando el parametro N.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Comparaciones con otros algoritmos}
+\begin{table}[ht]
+ \centering 
+	\begin{tabular}{ | c | c | c | c | c |}
+	\hline
+	   N  & \multicolumn{2}{|c|}{OpenModelica} & \multicolumn{2}{|c|}{ModelicaCC} \\ \cline{2-5}
+				& Tiempo(seg)	& Tamaño(bytes)	& Tiempo(seg)	& Tamaño(bytes) \\ \hline
+	   10    	& 3.792  		& 33.212		& 0.048 		& 3.708		\\ \hline
+	   100   	& 5.632   	 	& 302.374 		& 0.052    		& 3.723 		\\ \hline
+	   500   	& 19.440 		& 818.439 		& 0.044    		& 3.725 		\\ \hline
+	   1000  	& 51.628 		& 3.048.164	 	& 0.052	 		& 3.738		\\ \hline
+	   3000  	& 393.452 		& 9.272.336		& 0.044	 		& 3.740		\\ \hline
+	   5000  	& 1107.732 		& 15.496.336	& 0.052	 		& 3.740		\\ \hline
+	   10000 	& Error			& Error			& 0.058			& 3.753		\\ \hline
+	\end{tabular}	 
+	\caption{Tiempos de aplanado variando $N$ para el modelo LC\_line }
+\end{table}
+\end{frame}
+
+\section{Conclusiones y Trabajo a Futuro}
+\begin{frame}
+\frametitle{Conclusiones}
+\begin{itemize}
+ \item Desarrollamos un algoritmo de aplanado que preserva la vectorización del modelo.
+ \item Dentro de este algorimo, desarrollamos un métodos para encontrar las componente conexas dentro de un grafo bipartito vectorizado que luego aplicamos para calcular las conexiones del modelo sin necesidad de expandir el grafo.
+ \item Implementamos ambos algoritmos en C++ dentro de la herramienta ModelicaCC.
+ \item Realizamos pruebas tanto de ejemplos simples como de ejemplos vectoriales concluyendo que las transformaciones aplicadas por la herramienta desarrollada llegaban al resultado correcto.
+ \item Comparamos nuestra implementación del algoritmo de aplanado con la de la herramienta OpenModelica para distintos tamaños de modelos vectorizados.  
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Trabajo a Futuro}
+\begin{itemize}
+\item Adaptar el algorimo de resolución de ecuaciones \textit{connect} para resolver anidaciones de dos o más ecuaciones \textit{for}.
+
+\item  Sugerimos como trabajo futuro, una herramienta capaz de cargar dinámicamente los componentes necesarios de la librería \textit{Modelica} y así independizarnos de OpenModelica.
+
+\item Aplicar un caché de modelos aplanados con el objetivo de reducir a uno la cantidad de veces que aplanamos una misma clase.  
+
+\item Estudiar la posibilidad de paralelizar el aplanado de clases.    
+\end{itemize}
+\end{frame}
+
